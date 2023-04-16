@@ -1,0 +1,5 @@
+EdgeGPT
+httpx[socks]
+supervisor
+pproxy
+python-daemon

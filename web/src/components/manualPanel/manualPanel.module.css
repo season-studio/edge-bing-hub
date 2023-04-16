@@ -1,0 +1,133 @@
+.mainPanel {
+    position: fixed;
+    z-index: 99999;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: row;
+    padding: 0.5rem;
+    font-size: 1rem;
+}
+
+.button {
+    box-sizing: border-box;
+    border: 0;
+    border-radius: 0.5em;
+    height: 2em;
+    background-image: linear-gradient(180deg, var(--content-bg-color) 10.79%, var(--content-bg-color-dark) 87.08%);
+    box-shadow: 0 0 1px var(--shadow-color-heavy);
+    overflow: hidden;
+    width: 2em;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    justify-items: center;
+    align-items: center;
+    padding: 0.5em;
+    cursor: pointer;
+    user-select: none;
+    margin: 0 0 0 0.5em;
+}
+
+.button:hover {
+    box-shadow: 0 0 3px var(--shadow-color-strong);
+    width: unset;
+    overflow: unset;
+}
+
+.button:active {
+    background-image: linear-gradient(0deg, var(--content-bg-color) 10.79%, var(--content-bg-color-dark) 87.08%);
+}
+
+.button > svg {
+    fill: var(--content-text-color);
+    stroke: none;
+    width: 1em;
+    height: 1em;
+}
+
+.button > :not(svg) {
+    display: none;
+    margin: 0 0 0 0.5em;
+}
+
+.button:hover > :not(svg) {
+    display: unset;
+}
+
+.sendButton {
+    background-image: linear-gradient(90deg, var(--primary-bg-color-light) 10.79%, var(--primary-bg-color) 87.08%);
+    color: var(--primary-text-color);
+}
+
+.sendButton:active {
+    background-image: linear-gradient(0deg, var(--primary-bg-color-light) 10.79%, var(--primary-bg-color) 87.08%);
+}
+
+.sendButton > svg {
+    fill: var(--primary-text-color);
+}
+
+.resetButton {
+    background-image: linear-gradient(90deg, var(--primary-bg-color-light) 10.79%, var(--primary-bg-color) 87.08%);
+    height: 2.6rem;
+    width: 2.6rem;
+    fill: var(--primary-text-color);
+    color: var(--primary-text-color);
+    font-size: 1rem;
+    border-radius: 1.3rem;
+}
+
+.resetButton:active {
+    background-image: linear-gradient(270deg, var(--primary-bg-color-light) 10.79%, var(--primary-bg-color) 87.08%);
+}
+
+.resetButton > svg {
+    fill: var(--primary-text-color);
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.inputArea {
+    background-color: var(--content-bg-color);
+    border: 0px;
+    border-radius: 0.5em;
+    flex-grow: 1;
+    margin: 0;
+    margin-left: 0.5em;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 3px var(--shadow-color);
+}
+
+.inputBox {
+    height: 2em;
+    padding: 0.5em;
+    border: 0;
+    border-radius: 0.5em;
+    box-sizing: border-box;
+    outline: none;
+    resize: none;
+    font-size: 1em;
+}
+
+.inputBox:focus {
+    height: 4em;
+}
+
+.toolBar {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    justify-items: center;
+    align-items: center;
+    font-size: 0.9em;
+    margin: 0.5em;
+}
+
+.wordCountLabel {
+    color: var(--content-text-color-light);
+    flex-grow: 1;
+    font-size: 0.9em;
+}

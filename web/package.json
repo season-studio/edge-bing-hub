@@ -1,0 +1,61 @@
+{
+  "name": "edge-gpt-frontend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack --mode production",
+    "build:dev": "webpack --mode development",
+    "dev-server": "webpack serve --mode development"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "core-js": "^3.9.1",
+    "es6-promise": "^4.2.8",
+    "markdown-it": "^13.0.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "regenerator-runtime": "^0.13.7"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.13.16",
+    "@babel/plugin-proposal-class-properties": "^7.3.0",
+    "@babel/polyfill": "^7.12.1",
+    "@babel/preset-env": "^7.15.6",
+    "@babel/preset-react": "^7.18.6",
+    "@babel/preset-typescript": "7.15.0",
+    "@types/custom-functions-runtime": "^1.6.4",
+    "@types/find-process": "1.2.0",
+    "@types/react": "^17.0.39",
+    "@types/react-dom": "^17.0.11",
+    "@types/react-hot-loader": "^4.1.1",
+    "acorn": "^8.5.0",
+    "babel-loader": "^8.3.0",
+    "copy-webpack-plugin": "^9.0.1",
+    "css-loader": "^6.7.3",
+    "css-minimizer-webpack-plugin": "^5.0.0",
+    "eslint-plugin-office-addins": "^2.1.5",
+    "eslint-plugin-react": "^7.28.0",
+    "file-loader": "^6.2.0",
+    "html-loader": "^4.1.0",
+    "html-webpack-plugin": "^5.5.0",
+    "less": "^3.10.3",
+    "less-loader": "^10.0.1",
+    "mini-css-extract-plugin": "^2.7.5",
+    "os-browserify": "^0.3.0",
+    "process": "^0.11.10",
+    "react-hot-loader": "^4.12.6",
+    "request": "^2.88.2",
+    "source-map-loader": "^3.0.0",
+    "style-loader": "^3.3.2",
+    "ts-loader": "^9.4.1",
+    "typescript": "^4.3.5",
+    "webpack": "^5.76.3",
+    "webpack-cli": "^5.0.1",
+    "webpack-dev-server": "4.13.1"
+  },
+  "browserslist": [
+    "ie 11"
+  ]
+}

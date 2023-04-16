@@ -1,0 +1,169 @@
+html {
+    font-size: 100%;
+}
+body {
+    --primary-bg-color: rgb(27, 74, 239);
+    --primary-bg-color-light: rgb(40, 112, 234);
+    --primary-text-color: #fff;
+    --error-bg-color-light: #f00;
+    --error-bg-color: #c00;
+    --error-text-color: #fff;
+    --shadow-color: #bbb;
+    --shadow-color-heavy: #999;
+    --shadow-color-strong: #777;
+    --content-bg-color: #fff;
+    --content-bg-color-dark: #f0f0f0;
+    --content-text-color: #000;
+    --content-text-color-light: #aaa;
+    --global-bg-color: #f0f0f0;
+    --global-font-family: -apple-system, Roboto, SegoeUI, 'Segoe UI', 'Helvetica Neue', Helvetica, 'Microsoft YaHei', 'Meiryo UI', Meiryo, Arial Unicode MS, sans-serif;
+    --global-font-weight: 400;
+    --code-bg-color: #eee;
+    --ref-bg-color: rgb(170, 201, 255);
+    --ref-text-color: rgb(24, 47, 128);
+    --ref-text-weight: 700;
+    --ref-block-bg-color: #eee;
+    --suggest-bg-color: var(--content-bg-color);
+    --suggest-text-color: var(--ref-text-color);
+    --suggest-text-weight: 700;
+
+    font-weight: var(--global-font-weight);
+    margin: 0.5em 0 0 0;
+    font-size: 1rem;
+    background-color: var(--global-bg-color);
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-end;
+    justify-items: flex-end;
+    display: flex;
+    position: relative;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+body * {
+    font-family: var(--global-font-family);
+}
+hr {
+    margin: 0.25em 0;
+}
+.chat-view {
+    padding: 0 0.5em 6.5em 0.5em;
+    display: flex;
+    flex-direction: column;
+    border: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+.chat-item {
+    position: relative;
+    margin: 0 0 1em 0;
+    width: 100%;
+    border: 0;
+    display: flex;
+    flex-direction: row;
+}
+.chat-content {
+    position: relative;
+    border: 0;
+    max-width: 90%;
+    padding: 0.5em;
+    border-radius: 0.5em;
+    box-shadow: 0 0 3px var(--shadow-color);
+    display: block;
+    overflow-wrap: break-word;
+}
+.chat-content pre {
+    overflow-x: auto;
+}
+.chat-content code {
+    background-color: var(--code-bg-color);
+    display: inline-block;
+    padding: 0.5em;
+    border: solid 1px var(--shadow-color);
+    border-radius: 0.25em;
+}
+.chat-content p {
+    margin: 0;
+}
+a.chat-ref,a.chat-ref:active,a.chat-ref:visited {
+    background-color: var(--ref-bg-color);
+    border: 0;
+    border-radius: 0.5em;
+    font-size: 0.5em;
+    color: var(--ref-text-color);
+    font-weight: var(--ref-text-weight);
+    padding: 0 0.25em;
+    text-decoration: none;
+    min-width: 2em;
+    text-align: center;
+    display: inline-block;
+    box-sizing: border-box;
+    margin: 0 0.1em 0 0;
+}
+.chat-ref-block {
+    background-color: var(--ref-block-bg-color);
+    font-size: 0.7em;
+    font-weight: var(--ref-text-weight);
+    border: 0;
+    border-radius: 0.5em;
+    margin: 0.25em 0;
+    padding: 0.5em;
+}
+.chat-ref-block .chat-ref {
+    font-size: 1em !important;
+    padding: 0 0.5em;
+    margin: 0.25em;
+}
+.chat-ask {
+    align-items: flex-end;
+    justify-content: flex-end;
+    justify-items: flex-end;
+}
+.ask-content {
+    background-image: linear-gradient(90deg, var(--primary-bg-color-light) 10.79%, var(--primary-bg-color) 87.08%);
+    color: var(--primary-text-color);
+}
+.chat-response {
+    align-items: flex-start;
+    justify-content: flex-start;
+    justify-items: flex-start;
+}
+.response-content {
+    background-color: var(--content-bg-color);
+    color: var(--content-text-color);
+}
+.chat-error {
+    align-items: center;
+    justify-content: center;
+    justify-items: center;
+}
+.error-content {
+    background-image: linear-gradient(180deg, var(--error-bg-color-light) 10.79%, var(--error-bg-color) 87.08%);
+    color: var(--error-text-color);
+}
+.chat-suggest {
+    align-items: flex-end;
+    justify-content: flex-end;
+    justify-items: flex-end;
+}
+.suggest-content {
+    background: none;
+    color: var(--content-text-color);
+    display: block;
+    font-size: 0.7em;
+    text-align: right;
+    box-shadow: none;
+    user-select: none;
+}
+.suggest-item {
+    background-color: var(--suggest-bg-color);
+    border: dashed 1px var(--suggest-text-color);
+    color: var(--suggest-text-color);
+    font-weight: var(--suggest-text-weight);
+    padding: 0.25em 0.5em;
+    border-radius: 0.5em;
+    margin: 0.25em;
+    display: inline-block;
+    cursor: pointer;
+}

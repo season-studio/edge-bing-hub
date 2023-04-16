@@ -1,0 +1,5 @@
+/cookies.json
+/config.json
+node_modules
+dist
+/web/assets/link-info.json
