@@ -141,6 +141,7 @@ a.chat-ref,a.chat-ref:active,a.chat-ref:visited {
 .error-content {
     background-image: linear-gradient(180deg, var(--error-bg-color-light) 10.79%, var(--error-bg-color) 87.08%);
     color: var(--error-text-color);
+    text-align: center;
 }
 .chat-suggest {
     align-items: flex-end;

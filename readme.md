@@ -4,7 +4,7 @@ This project takes the [EdgeGPT](https://github.com/acheong08/EdgeGPT/) as the c
 
 # How to use
 
-### 1. Check if you have a Microsoft account with access to <https://bing.com/chat>
+### 1. Check if you have a Microsoft account with accessing to <https://bing.com/chat>
 
 - Install the Dev Edition of the Microsoft Edge
 - Open [bing.com/chat](https://bing.com/chat)
@@ -46,4 +46,6 @@ $ npm run dev-server
 
 ## Discuss
 
-You can deploy this project on the server. The target files of the front-end are inside ``./web/dist`` after you run ``npm run build``. Be sure the value of ``url`` in the ``link-info.json`` is the correct address of the server running the web service.
+- I have only tested the shadowsocks as the proxy.
+- You can deploy this project on the server. The target files of the front-end are inside ``./web/dist`` after you run ``npm run build``. Be sure the value of ``url`` in the ``link-info.json`` is the correct address of the server running the web service. **But please note whether this behavior conforms to local laws.**
+- You can use EdgeGPT in console mode directly. Please visit the [EdgeGPT's home page ](https://github.com/acheong08/EdgeGPT/) for the usage.

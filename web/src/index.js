@@ -86,7 +86,7 @@ class MainView extends React.Component {
 
         this.markdown = new MarkdownIt();
         this.getSocket = prepareGetWebsocketFunction(
-            (e) => this.onResponse(JSON.parse(e.data)), 
+            (e) => this.onResponse(JSON.parse(atob(e.data))), 
             (e) => ((e.$isManualClose) || this.appendChatItem("error", "服务器连接已关闭，请重试"))
         );
         window.onresize = () => this.adjustChatView();
@@ -149,7 +149,7 @@ class MainView extends React.Component {
                 throw "无法创建通讯连接";
             }
             _msg.id = `${Date.now()}-${Math.random()}`;
-            socket.send(JSON.stringify(_msg));
+            socket.send(btoa(JSON.stringify(_msg)));
             if (_msg.action === "ask") {
                 let respItem = await this.getResponseItem(_msg.id, socket);
                 if (respItem) {
