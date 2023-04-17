@@ -109,7 +109,7 @@ BotStyleMap = {
 }
 
 @msg_proc("ask")
-async def procAsk(websocket, msg):
+async def procAsk(websocket, msg, sendFn):
     try:
         print(msg)
         botStyle = msg["style"] if "sytle" in msg else "creative"
@@ -118,7 +118,7 @@ async def procAsk(websocket, msg):
         timeStamp = 0
         async for response in bot.ask_stream(prompt=msg["text"], conversation_style=botStyle, wss_link=ChatbotManagerInstance.config["wss.link"]):
             if response[0]:
-                await websocket.send(json.dumps({
+                await sendFn(json.dumps({
                     "type": "response",
                     "action": msg["action"],
                     "for": msg["id"],
@@ -129,7 +129,7 @@ async def procAsk(websocket, msg):
                 curTime = int(time.time()*1000)
                 if (timeStamp == 0) or (curTime - timeStamp >= ChatbotManagerInstance.waitTickThreshold):
                     timeStamp = curTime
-                    await websocket.send(json.dumps({ 
+                    await sendFn(json.dumps({ 
                         "type": "wait",
                         "action": msg["action"],
                         "for": msg["id"],
@@ -139,10 +139,10 @@ async def procAsk(websocket, msg):
         print("!!!EXCEPTION!!!")
         print(e)
         traceback.print_exc()
-        await websocket.send(json.dumps({ "type": "error" }))
+        await sendFn(json.dumps({ "type": "error" }))
 
 @msg_proc("reset")
-async def procReset(websocket, msg):
+async def procReset(websocket, msg, sendFn):
     try:
         print(msg)
         await ChatbotManagerInstance.resetBot(websocket.id)
@@ -151,23 +151,38 @@ async def procReset(websocket, msg):
             "action": msg["action"],
             "for": msg["id"]
         }
-        await websocket.send(json.dumps(reply))
+        await sendFn(json.dumps(reply))
     except Exception as e:
         print("!!!EXCEPTION!!!")
         print(e)
         traceback.print_exc()
-        await websocket.send(json.dumps({ "type": "error" }))
+        await sendFn(json.dumps({ "type": "error" }))
 
 async def handler(websocket):
     try:
+        async def sendFn(respStr):
+            await websocket.send(str(base64.b64encode(bytes(respStr, "utf-8")), "utf-8"))
         async for message in websocket:
-            msg = json.loads(message)
-            func = MessageProcessorMap[msg["action"]]
-            if func != None:
-                await func(websocket, msg)
+            try:
+                msg = json.loads(base64.b64decode(message).decode("utf-8", errors="replace").replace("�", " "))
+                func = MessageProcessorMap[msg["action"]]
+                if func != None:
+                    await func(websocket, msg, sendFn)
+            except websockets.ConnectionClosed:
+                raise
+            except Exception as e:
+                print (f"Unhandle exception {e} in socket({websocket.id})")
+                try:
+                    await websocket.send(str(base64.b64encode(bytes(json.dumps({
+                        "type": "error",
+                        "error": f"{e}"
+                    }), "utf-8")), "utf-8"))
+                except:
+                    await websocket.close()
     except websockets.ConnectionClosed:
         print (f"Connection closed({websocket.id})")
     finally:
+        print ("Wait close")
         await websocket.wait_closed()
         print (f"Connection closed gracefully({websocket.id})")
         await ChatbotManagerInstance.removeBot(websocket.id)

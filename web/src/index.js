@@ -2,6 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { ManualPanel } from "./components/manualPanel";
 import * as MarkdownIt from "markdown-it";
+import { Base64 } from "js-base64";
 import "./index.css";
 
 function resize(_view) {
@@ -86,7 +87,7 @@ class MainView extends React.Component {
 
         this.markdown = new MarkdownIt();
         this.getSocket = prepareGetWebsocketFunction(
-            (e) => this.onResponse(JSON.parse(e.data)), 
+            (e) => this.onResponse(JSON.parse(Base64.decode(e.data))), 
             (e) => ((e.$isManualClose) || this.appendChatItem("error", "服务器连接已关闭，请重试"))
         );
         window.onresize = () => this.adjustChatView();
@@ -149,7 +150,7 @@ class MainView extends React.Component {
                 throw "无法创建通讯连接";
             }
             _msg.id = `${Date.now()}-${Math.random()}`;
-            socket.send(JSON.stringify(_msg));
+            socket.send(Base64.encode(JSON.stringify(_msg)));
             if (_msg.action === "ask") {
                 let respItem = await this.getResponseItem(_msg.id, socket);
                 if (respItem) {
@@ -157,7 +158,7 @@ class MainView extends React.Component {
                 }
             }
         } catch (err) {
-            this.appendChatItem("error", _err);
+            this.appendChatItem("error", err);
         }
     }
 
@@ -166,7 +167,7 @@ class MainView extends React.Component {
             let fn = this[`${_resp.type}Proc`];
             (typeof fn === "function") && fn.call(this, _resp);
         } catch (err) {
-            this.appendChatItem("error", "无法处理的应答\n" + String(_err));
+            this.appendChatItem("error", "无法处理的应答\n" + String(err));
         }
     }
 
