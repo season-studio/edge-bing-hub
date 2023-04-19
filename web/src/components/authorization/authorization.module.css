@@ -1,0 +1,79 @@
+.authBackground {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    justify-items: center;
+    text-align: center;
+    flex-direction: column;
+    background-color: #fff;
+    opacity: 0.7;
+    font-size: 1em;
+}
+.authPanel {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    justify-items: center;
+    text-align: center;
+    flex-direction: column;
+    font-size: 1em;
+    color: #000;
+    border: 0;
+    border-radius: 0.5em;
+    box-shadow: 0 0 5px #bbb;
+    padding: 1em;
+    user-select: none;
+    -webkit-user-select: none;
+}
+.authItemTitle {
+    font-size: 1.05em;
+    font-weight: 700;
+}
+.authPanel > * {
+    margin: 0.5em 0 0 0;
+}
+.authPanel > input {
+    outline: none;
+    text-align: center;
+    padding: 0.5em;
+    border-radius: 0.25em;
+    border: solid 1px var(--shadow-color-heavy);
+}
+.authQRCode {
+    width: 100px;
+    height: 100px;
+    border: none;
+}
+.authButton {
+    margin: 0.5em;
+    cursor: pointer;
+    padding: 0.5em 1em;
+    border: 0;
+    box-sizing: border-box;
+    border-radius: 2em;
+    background-image: linear-gradient(180deg, var(--primary-bg-color-light) 10.79%, var(--primary-bg-color) 87.08%);
+    color: var(--primary-text-color);
+    text-align: center;
+    font-weight: 700;
+}
+.authButton:active {
+    background-image: linear-gradient(0deg, var(--primary-bg-color-light) 10.79%, var(--primary-bg-color) 87.08%);
+}
+.authRegistration {
+    margin: 0.5em;
+    font-size: 0.7em;
+    cursor: pointer;
+    text-decoration-line: underline;
+    color: var(--primary-bg-color-light);
+}
+.authError {
+    font-size: 0.7em;
+    color: #f00;
+}
+

@@ -12,6 +12,12 @@ import sys
 import base64
 import re
 import urllib.parse
+from simpleUserManager import SimpleUserManager
+import datetime
+
+TokenExpDeltaTime = datetime.timedelta(days = 7)
+
+UserManager = None
 
 def proxyUrlDecode(url):
     def authoriseReplacement(match):
@@ -36,6 +42,9 @@ class ChatbotManager:
         self.bots = {}
         self.proxyP = None
         self.localProxy = None
+        if "token.expire.days" in self.config:
+            global TokenExpDeltaTime
+            TokenExpDeltaTime = datetime.timedelta(days = self.config["token.expire.days"])
         if "remote.proxy" in self.config:
             proxyStr = self.config["remote.proxy"]
             if not isinstance(proxyStr, str):
@@ -47,7 +56,7 @@ class ChatbotManager:
                 self.config["remote.proxy"] = proxyURL
                 self.config["remote.proxy.desc"] = proxyDesc
                 localPort = self.config["local.proxy.port"] if "local.proxy.port" in self.config else None
-                localPort = localPort if isinstance(localPort, int) and localPort >= 10000 else 10000
+                localPort = localPort if isinstance(localPort, int) and localPort >= 20000 else 20000
                 self.localProxy = f"socks5://127.0.0.1:{localPort}"
 
     def checkProxy(self):
@@ -71,7 +80,7 @@ class ChatbotManager:
         self.checkProxy()
         key = str(key)
         bot = self.bots.get(key)
-        if bot == None:
+        if bot is None:
             bot = Chatbot(cookies=self.cookies, proxy=self.localProxy)
             self.bots[key] = bot
         return bot
@@ -111,7 +120,9 @@ BotStyleMap = {
 @msg_proc("ask")
 async def procAsk(websocket, msg, sendFn):
     try:
-        print(msg)
+        token = UserManager.checkUserTokenWithUpdate(msg["user"], msg["token"], expDays = TokenExpDeltaTime)
+        if not token is None:
+            await sendFn(json.dumps({ "type": "updateToken", "user": msg["user"], "token": token, "max-age": int(TokenExpDeltaTime.total_seconds()) }))
         botStyle = msg["style"] if "sytle" in msg else "creative"
         botStyle = BotStyleMap[botStyle] if botStyle in BotStyleMap else ConversationStyle.creative
         bot = ChatbotManagerInstance.getBot(websocket.id)
@@ -144,7 +155,6 @@ async def procAsk(websocket, msg, sendFn):
 @msg_proc("reset")
 async def procReset(websocket, msg, sendFn):
     try:
-        print(msg)
         await ChatbotManagerInstance.resetBot(websocket.id)
         reply = {
             "type": "response",
@@ -158,6 +168,42 @@ async def procReset(websocket, msg, sendFn):
         traceback.print_exc()
         await sendFn(json.dumps({ "type": "error" }))
 
+@msg_proc("checkUser")
+async def procCheckUser(websocket, msg, sendFn):
+    try:
+        token = UserManager.checkUserTokenWithUpdate(msg["user"], msg["token"], expDays = TokenExpDeltaTime) if "token" in msg else UserManager.checkUserOtpWithWithUpdateToken(msg["user"], msg["code"], expDays = TokenExpDeltaTime)
+        await sendFn(json.dumps({ "type": "updateToken", "user": msg["user"], "token": token, "max-age": int(TokenExpDeltaTime.total_seconds()) }))
+    except:
+        try:
+            errCode = 0
+            if UserManager.hasUser(msg["user"]):
+                errCode = 1
+            elif UserManager.isUserInit(msg["user"]):
+                errCode = 2
+            await sendFn(json.dumps({ "type": "authorizeFail", "code": errCode }))
+        except:
+            traceback.print_exc()
+            await sendFn(json.dumps({ "type": "error" }))
+
+@msg_proc("initUser")
+async def procInitUser(websocket, msg, sendFn):
+    try:
+        if "code" in msg:
+            token = UserManager.initUserFinal(msg["user"], msg["code"], TokenExpDeltaTime)
+            if token is None:
+                raise RuntimeError("Fail in step 2")
+            else:
+                await sendFn(json.dumps({ "type": "updateToken", "user": msg["user"], "token": token, "max-age": int(TokenExpDeltaTime.total_seconds()) }))
+        else:
+            uri = UserManager.initUserStart(msg["user"])
+            if uri is None:
+                raise RuntimeError("Fail in step 1")
+            else:
+                await sendFn(json.dumps({ "type": "initUserTOTP", "uri": uri }))
+    except:
+        traceback.print_exc()
+        await sendFn(json.dumps({ "type": "error" }))
+
 async def handler(websocket):
     try:
         async def sendFn(respStr):
@@ -165,6 +211,7 @@ async def handler(websocket):
         async for message in websocket:
             try:
                 msg = json.loads(base64.b64decode(message).decode("utf-8", errors="replace").replace("�", " "))
+                print(msg)
                 func = MessageProcessorMap[msg["action"]]
                 if func != None:
                     await func(websocket, msg, sendFn)
@@ -182,7 +229,6 @@ async def handler(websocket):
     except websockets.ConnectionClosed:
         print (f"Connection closed({websocket.id})")
     finally:
-        print ("Wait close")
         await websocket.wait_closed()
         print (f"Connection closed gracefully({websocket.id})")
         await ChatbotManagerInstance.removeBot(websocket.id)
@@ -201,10 +247,18 @@ async def main():
         required=True,
         help="Path of the json file storing the cookies",
     )
+    parser.add_argument(
+        "--users",
+        type=str,
+        required=True,
+        help="Path of the file storing the users",
+    )
     args = parser.parse_args()
     global ChatbotManagerInstance
+    global UserManager
     ChatbotManagerInstance = ChatbotManager(args.config, args.cookies)
     ChatbotManagerInstance.checkProxy()
+    UserManager = SimpleUserManager(args.users, "Edge Bing Hub")
     print("Starting the websocket service")
     async with websockets.serve(handler, "0.0.0.0", ChatbotManagerInstance.config["port"]):
         await asyncio.Future()  # run forever

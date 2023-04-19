@@ -1,14 +1,15 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { ManualPanel } from "./components/manualPanel";
+import { Authorization, getCachedAuthorization, cachedAuthorization } from "./components/authorization";
+import { prepareGetWebsocketFunction } from "./websocketClient";
 import * as MarkdownIt from "markdown-it";
-import { Base64 } from "js-base64";
 import "./index.css";
 
 function resize(_view) {
     let body = document.querySelector("body");
     if (body) {
-        body.style.position = (_view.clientHeight < window.innerHeight) ? "absolute" : "relative";
+        body.style.position = (_view?.clientHeight < window.innerHeight) ? "absolute" : "relative";
     }
 }
 
@@ -25,69 +26,15 @@ function normalizeH5Text(_text) {
     })
 }
 
-function prepareGetWebsocketFunction(_msgCallback, _closeCallback) {
-    const WebSocketCloseManually = "wsmc-" + Date.now();
-    let instance = null;
-    let fn = function () {
-        if (instance instanceof WebSocket) {
-            return Promise.resolve(instance);
-        } else if (instance instanceof Promise) {
-            return instance;
-        } else {
-            return fetch("assets/link-info.json")
-                    .then(r => r.json())
-                    .then(linkInfo => {
-                        instance = new Promise(r => {
-                            let newSocket = new WebSocket(linkInfo.url);
-                            newSocket.$respLogs = {};
-                            newSocket.addEventListener("open", () => {
-                                instance = newSocket;
-                                r(newSocket);
-                            });
-                            newSocket.addEventListener("message", (e) => ((typeof _msgCallback === "function") && _msgCallback(e)));
-                            newSocket.addEventListener("close", (e) => {
-                                instance = null;
-                                e.$isManualClose = (e.reason === WebSocketCloseManually);
-                                (typeof _closeCallback === "function") && _closeCallback(e);
-                            });
-                        });
-                        return instance;
-                    });
-        }
-    };
-    function closePromise(r) {
-        try {
-            if (instance instanceof WebSocket) {
-                if (instance.readyState > 1) {
-                    r();
-                } else {
-                    instance.addEventListener("close", () => r(), { once: true });
-                    instance.close(1000, WebSocketCloseManually);
-                }
-            }
-        } catch {
-            r();
-        }
-    }
-    fn.close = function () {
-        if (instance instanceof WebSocket) {
-            return new Promise(closePromise);
-        } else if (instance instanceof Promise) {
-            return instance.then(() => new Promise(closePromise));
-        }
-    }
-    Object.freeze(fn);
-    return fn;
-}
-
 class MainView extends React.Component {
 
     constructor(_props) {
         super(_props);
 
+        this.state = {}
         this.markdown = new MarkdownIt();
         this.getSocket = prepareGetWebsocketFunction(
-            (e) => this.onResponse(JSON.parse(Base64.decode(e.data))), 
+            (e) => this.onResponse(JSON.parse(e)), 
             (e) => ((e.$isManualClose) || this.appendChatItem("error", "服务器连接已关闭，请重试"))
         );
         window.onresize = () => this.adjustChatView();
@@ -114,7 +61,7 @@ class MainView extends React.Component {
     adjustChatView() {
         setImmediate(() => {
             resize(this.refs.chatView);
-            this.refs.chatView.scrollIntoView(false);
+            this.refs.chatView?.scrollIntoView(false);
         });
     }
 
@@ -150,11 +97,13 @@ class MainView extends React.Component {
                 throw "无法创建通讯连接";
             }
             _msg.id = `${Date.now()}-${Math.random()}`;
-            socket.send(Base64.encode(JSON.stringify(_msg)));
+            let auth = getCachedAuthorization();
+            _msg = Object.assign(_msg, auth)
+            socket.sendEx(JSON.stringify(_msg));
             if (_msg.action === "ask") {
                 let respItem = await this.getResponseItem(_msg.id, socket);
                 if (respItem) {
-                    respItem.$content.innerHTML = "发送成功，等待应答……";
+                    respItem.$content.innerHTML = "<p style=\"display:inline-flex;align-items:center;\">发送成功，等待应答&nbsp;<span class=\"waiting-circle\" style=\"--size: 1em;\" /></p>";
                 }
             }
         } catch (err) {
@@ -168,6 +117,13 @@ class MainView extends React.Component {
             (typeof fn === "function") && fn.call(this, _resp);
         } catch (err) {
             this.appendChatItem("error", "无法处理的应答\n" + String(err));
+        }
+    }
+
+    async updateTokenProc(_resp) {
+        if (_resp.token) {
+            console.log("Update token", _resp.token);
+            cachedAuthorization(_resp.user, _resp.token, resp["max-age"]);
         }
     }
 
@@ -312,12 +268,16 @@ class MainView extends React.Component {
     }
 
     render() {
-        return (
-        <>
-            <div ref="chatView" className="chat-view" onClick={(e) => this.onviewClick(e)}>
-            </div>
-            <ManualPanel onAction={(e) => this.onAction(e)} onExport={() => this.onExport()} />
-        </>);
+        return (<>{
+            this.state.hasAuth ? (
+                <>
+                    <div ref="chatView" className="chat-view" onClick={(e) => this.onviewClick(e)}></div>
+                    <ManualPanel onAction={(e) => this.onAction(e)} onExport={() => this.onExport()} />
+                </>
+            ) : (
+                <Authorization onSignIn={() => this.setState({hasAuth:true})} />
+            )
+        }</>);
     }
 }
 

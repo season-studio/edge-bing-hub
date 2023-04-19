@@ -2,5 +2,6 @@
     "port": 7171,
     "remote.proxy": "ss://xxxxxxxxxxxxxxxxxx",
     "wss.link": "wss://sydney.bing.com/sydney/ChatHub",
-    "wait.tick.threshold": 1000
+    "wait.tick.threshold": 1000,
+    "token.expire.days": 7
 }

@@ -3,3 +3,4 @@
 node_modules
 dist
 /web/assets/link-info.json
+__pycache__

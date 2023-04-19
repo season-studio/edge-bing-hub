@@ -156,6 +156,7 @@ a.chat-ref,a.chat-ref:active,a.chat-ref:visited {
     text-align: right;
     box-shadow: none;
     user-select: none;
+    -webkit-user-select: none;
 }
 .suggest-item {
     background-color: var(--suggest-bg-color);
@@ -167,4 +168,37 @@ a.chat-ref,a.chat-ref:active,a.chat-ref:visited {
     margin: 0.25em;
     display: inline-block;
     cursor: pointer;
+}
+.waiting-circle {
+    border: none;
+    box-sizing: border-box;
+    position: relative;
+    --box-size: var(--size, 26px);
+    --border-size: var(--bsize, calc(var(--box-size) / 10));
+    width: var(--box-size);
+    height: var(--box-size);
+    display: flex;
+    justify-content: center;
+    justify-items: center;
+    align-items: center;
+}
+.waiting-circle::after {
+    content: " ";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: var(--box-size);
+    height: var(--box-size);
+    border-width: var(--border-size);
+    border-style: solid;
+    border-radius: calc(var(--box-size) / 2);
+    border-color: var(--primary-bg-color) var(--primary-bg-color) var(--primary-bg-color-light) transparent;
+    box-sizing: border-box;
+    animation: waiting-circle-ani-frames var(--time, 1s) infinite linear var(--delay, 0s);
+}
+@keyframes waiting-circle-ani-frames {
+    0%   { transform: rotate(0deg); }
+    33%  { transform: rotate(140deg); }
+    66%  { transform: rotate(220deg); }
+    100% { transform: rotate(360deg); }
 }

@@ -3,3 +3,5 @@ httpx[socks]
 supervisor
 pproxy
 python-daemon
+pyotp
+PyJWT
