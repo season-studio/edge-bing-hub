@@ -131,7 +131,7 @@ class MainView extends React.Component {
         if (_resp.action === "ask") {
             let respItem = await this.getResponseItem(_resp.for, false);
             if (respItem) {
-                let response = _resp.response.item.messages.find(e => e.author === "bot");
+                let response = _resp.response.item.messages.find(e => ((e.author === "bot") && !e.messageType));
                 respItem.$botResponse = response;
                 console.log(response);
 
